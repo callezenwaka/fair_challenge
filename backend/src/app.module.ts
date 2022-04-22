@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { join } from 'path';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TokenModule } from './token/token.module';
@@ -8,8 +8,9 @@ import { TokenModule } from './token/token.module';
 @Module({
   imports: [
     TokenModule,
-    GraphQLModule.forRoot({
-      autoSchemaFile: join(process.cwd(), 'src/graphql-schema.gql'),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: 'schema.gql',
     }),
   ],
   controllers: [AppController],

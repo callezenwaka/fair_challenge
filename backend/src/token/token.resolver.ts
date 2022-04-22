@@ -1,10 +1,13 @@
-import { Query } from '@nestjs/common';
-import { Resolver } from '@nestjs/graphql';
+import { Resolver, Query } from '@nestjs/graphql';
+import { Token } from './entities/token.entity';
+import { TokenService } from './token.service';
 
-@Resolver()
+@Resolver(() => Token)
 export class TokenResolver {
-  @Query()
+  constructor(private tokenService: TokenService) {}
+
+  @Query(() => [Token], { name: 'getTokens' })
   findAll() {
-    
+    return this.tokenService.findAll();
   }
 }

@@ -1,13 +1,15 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
 @Entity()
 export class Token {
   @Field(() => Int)
+  @PrimaryGeneratedColumn()
   id: number;
 
   @Field()
+  @Column()
   name: string;
 
   @Field({ nullable: true })
