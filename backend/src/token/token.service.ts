@@ -4,7 +4,7 @@ import { Token } from './entities/token.entity';
 
 @Injectable()
 export class TokenService {
-  async findAll(): Promise<Token[]> {
+  async getTokens(): Promise<Token[]> {
     // return this.tokenRepository.find();
     const token = new Token();
     token.id = 1;

@@ -7,7 +7,7 @@ export class TokenResolver {
   constructor(private tokenService: TokenService) {}
 
   @Query(() => [Token], { name: 'getTokens' })
-  findAll() {
-    return this.tokenService.findAll();
+  getTokens() {
+    return this.tokenService.getTokens();
   }
 }
