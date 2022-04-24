@@ -1,16 +1,29 @@
+import { ApolloDriverConfig, ApolloDriver } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
 import { AppController } from './app.controller';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppService } from './app.service';
 import { TokenModule } from './token/token.module';
 
 @Module({
   imports: [
-    TokenModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: 'schema.gql',
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+    }),
+    TokenModule,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'tokens',
+      password: '@cc3ss',
+      database: 'tokens',
+      entities: ['dist/**/*.entity{.ts,.js}'],
+      synchronize: true,
+      logging: false,
     }),
   ],
   controllers: [AppController],

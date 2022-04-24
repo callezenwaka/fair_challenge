@@ -14,9 +14,5 @@ export class Token {
 
   @Field({ nullable: true })
   @Column({ nullable: true })
-  date?: string;
-
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  time?: string;
+  launch?: Date;
 }
