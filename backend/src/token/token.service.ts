@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
+import { MailService } from '../mail/mail.service';
 import { Args, Int } from '@nestjs/graphql';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
@@ -15,8 +16,43 @@ export class TokenService {
   constructor(
     @InjectRepository(Token) private tokenRepository: Repository<Token>,
     @InjectRepository(Email) private emailRepository: Repository<Email>,
-    private schedulerRegistry: SchedulerRegistry,
+    private readonly schedulerRegistry: SchedulerRegistry,
+    private readonly mailService: MailService,
   ) {}
+
+  private schedules(launch: Date, address: string, id: number) {
+    console.log(address, launch, id);
+    const time = new Date(launch).getTime();
+    console.log('schedules: ', time);
+    const day_ms = 1000 * 60 * 60 * 24;
+    const hour_ms = 1000 * 60 * 60;
+    const min_ms = 1000 * 60 * 30;
+    const day = Math.floor(time - day_ms);
+    const hour = Math.floor(time - hour_ms);
+    const min = Math.floor(time - min_ms);
+    console.log('day: ', day, 'hour', hour, 'min', min);
+
+    return [
+      {
+        time: day,
+        name: `day_${address}_${id}`,
+        job: `day_job`,
+        when: '1 day',
+      },
+      {
+        time: hour,
+        name: `hour_${address}_${id}`,
+        job: `hour_job`,
+        when: '1 day',
+      },
+      {
+        time: min,
+        name: `min_${address}_${id}`,
+        job: `min_job`,
+        when: '1 day',
+      },
+    ];
+  }
 
   /**
    * add token
@@ -91,7 +127,8 @@ export class TokenService {
     }
 
     if (token.launch !== null) {
-      this.addNewJob(address, token.launch, token.id);
+      console.log('Add new job', address, token.launch, token.id);
+      this.addNewJob(address, token.launch, token);
     }
 
     await this.tokenRepository.save(token);
@@ -100,33 +137,62 @@ export class TokenService {
     });
   }
 
-  addNewJob(address: string, launch: Date, id: number) {
-    const time = new Date(launch).getTime();
-    console.log(address, time, id);
-    const day_ms = 1000 * 60 * 60 * 24;
-    const hour_ms = 1000 * 60 * 60;
-    const min_ms = 1000 * 60 * 30;
-    const day = Math.floor((time - day_ms) / 1000);
-    const hour = Math.floor((time - hour_ms) / 1000);
-    const min = Math.floor((time - min_ms) / 1000);
-    const job1 = new CronJob(new Date(day * 1000), () => {
-      console.log(`time (${new Date(day * 1000)}) for job ${address} to run!`);
+  addNewJob(address: string, launch: Date, token: Token) {
+    const { id, name } = token;
+    const schedules = this.schedules(launch, address, id);
+    schedules.forEach((schedule) => {
+      console.log('schedule: ', schedule.time);
+      const job = new CronJob(new Date(schedule.time), () => {
+        console.log(`${schedule.name} job at (${new Date(schedule.time)})!`);
+      });
+      this.schedulerRegistry.addCronJob(`${schedule.name}`, job);
+      job.start();
+      console.log(
+        `Job ${schedule.name} scheduled for ${new Date(schedule.time)}.`,
+      );
     });
-    const job2 = new CronJob(new Date(hour * 1000), () => {
-      console.log(`time (${new Date(hour * 1000)}) for job ${address} to run!`);
-    });
-    const job3 = new CronJob(new Date(min * 1000), () => {
-      console.log(`time (${new Date(min * 1000)}) for job ${address} to run!`);
-    });
+    // const time = new Date(launch).getTime();
+    // console.log(address, time, id);
+    // const day_ms = 1000 * 60 * 60 * 24;
+    // const hour_ms = 1000 * 60 * 60;
+    // const min_ms = 1000 * 60 * 30;
+    // const day = Math.floor((time - day_ms) / 1000);
+    // const hour = Math.floor((time - hour_ms) / 1000);
+    // const min = Math.floor((time - min_ms) / 1000);
 
-    this.schedulerRegistry.addCronJob(`day_${address}_${id}`, job1);
-    job1.start();
-    this.schedulerRegistry.addCronJob(`hour_${address}_${id}`, job2);
-    job2.start();
-    this.schedulerRegistry.addCronJob(`min_${address}_${id}`, job3);
-    job3.start();
+    // const job1 = new CronJob(new Date(day * 1000), () => {
+    //   console.log(`time (${new Date(day * 1000)}) for job ${address} to run!`);
+    //   // this.mailService.sendMail({
+    //   //   to: address,
+    //   //   subject: `Token Reminder`,
+    //   //   text: `REMINDER - THE COLLECTION ${name} LAUNCHES IN 1day`,
+    //   // });
+    // });
+    // const job2 = new CronJob(new Date(hour * 1000), () => {
+    //   console.log(`time (${new Date(hour * 1000)}) for job ${address} to run!`);
+    //   // this.mailService.sendMail({
+    //   //   to: address,
+    //   //   subject: `Token Reminder`,
+    //   //   text: `REMINDER - THE COLLECTION ${name} LAUNCHES IN 1h`,
+    //   // });
+    // });
+    // const job3 = new CronJob(new Date(min * 1000), () => {
+    //   console.log(`time (${new Date(min * 1000)}) for job ${address} to run!`);
+    //   // this.mailService.sendMail({
+    //   //   to: address,
+    //   //   subject: `Token Reminder`,
+    //   //   text: `REMINDER - THE COLLECTION ${name} LAUNCHES IN 30 mins`,
+    //   // });
+    // });
 
-    console.log(`Job ${address} added for time ${new Date(time)}.`);
+    // this.schedulerRegistry.addCronJob(`day_${address}_${id}`, job1);
+    // job1.start();
+    // this.schedulerRegistry.addCronJob(`hour_${address}_${id}`, job2);
+    // job2.start();
+    // this.schedulerRegistry.addCronJob(`min_${address}_${id}`, job3);
+    // job3.start();
+
+    // console.log(`Job ${address} added for time ${new Date(time)}.`);
   }
 
   deleteCronJob(name: string) {
@@ -158,7 +224,11 @@ export class TokenService {
         }
       }
       console.log('Add new job', email.address, time, id);
-      this.addNewJob(email.address, time, id);
+      this.addNewJob(email.address, time, token);
+      const jobs = this.schedulerRegistry.getCronJobs();
+      jobs.forEach((value, key, map) => {
+        console.log(key);
+      });
     });
   }
 }
