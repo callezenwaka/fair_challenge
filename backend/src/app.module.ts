@@ -13,7 +13,6 @@ import { TokenModule } from './token/token.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
-    TokenModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -25,6 +24,7 @@ import { TokenModule } from './token/token.module';
       synchronize: true,
       logging: false,
     }),
+    TokenModule,
   ],
   controllers: [AppController],
   providers: [AppService],
