@@ -1,5 +1,12 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Email } from 'src/email/entities/email.entity';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @ObjectType()
 @Entity()
@@ -15,4 +22,11 @@ export class Token {
   @Field({ nullable: true })
   @Column({ nullable: true })
   launch?: Date;
+
+  @ManyToMany(() => Email, (email) => email.tokens, {
+    cascade: true,
+  })
+  @JoinTable()
+  @Field(() => [Email], { nullable: true })
+  emails?: Email[];
 }

@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppService } from './app.service';
 import { TokenModule } from './token/token.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TokenModule } from './token/token.module';
       logging: false,
     }),
     TokenModule,
+    EmailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

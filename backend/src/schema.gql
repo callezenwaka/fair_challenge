@@ -2,10 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Email {
+  id: Int!
+  address: String!
+  tokens: [Token!]
+}
+
 type Token {
   id: Int!
   name: String!
   launch: DateTime
+  emails: [Email!]
 }
 
 """
@@ -16,6 +23,8 @@ scalar DateTime
 type Query {
   getTokens: [Token!]!
   getToken(id: Int!): Token!
+  getEmails: [Email!]!
+  getEmail(id: Int!): Email!
 }
 
 type Mutation {
@@ -23,6 +32,9 @@ type Mutation {
   updateToken(updateTokenInput: updateTokenInput!): Token!
   deleteToken(id: Int!): Token!
   subscribeToken(subscribeTokenInput: subscribeTokenInput!): Token!
+  postEmail(postEmailInput: postEmailInput!): Email!
+  updateEmail(updateEmailInput: UpdateEmailInput!): Email!
+  removeEmail(id: Int!): Email!
 }
 
 input postTokenInput {
@@ -39,4 +51,13 @@ input updateTokenInput {
 input subscribeTokenInput {
   id: Int!
   address: String!
+}
+
+input postEmailInput {
+  address: String!
+}
+
+input UpdateEmailInput {
+  address: String
+  id: Int!
 }
