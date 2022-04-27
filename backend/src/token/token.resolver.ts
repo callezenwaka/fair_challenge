@@ -10,12 +10,12 @@ import { DeleteResult } from 'typeorm';
 export class TokenResolver {
   constructor(private tokenService: TokenService) {}
 
-  @Query(() => [Token], { name: 'getTokens' })
+  @Query(() => [Token], { name: 'tokens' })
   getTokens(): Promise<Token[]> {
     return this.tokenService.getTokens();
   }
 
-  @Query(() => Token, { name: 'getToken' })
+  @Query(() => Token, { name: 'token' })
   getToken(@Args('id', { type: () => Int }) id: number): Promise<Token> {
     return this.tokenService.getToken(id);
   }
