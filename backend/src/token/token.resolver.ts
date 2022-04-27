@@ -4,7 +4,6 @@ import { postTokenInput } from './dto/post.token.input';
 import { updateTokenInput } from './dto/update.token.input';
 import { subscribeTokenInput } from './dto/subscribe.token.input';
 import { Token } from './entities/token.entity';
-// import { Subscription } from './interfaces/subscription.interface';
 import { DeleteResult } from 'typeorm';
 
 @Resolver(() => Token)

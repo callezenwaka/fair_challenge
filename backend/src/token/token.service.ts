@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SchedulerRegistry } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
 import { CronJob } from 'cron';
 import { MailService } from '../mail/mail.service';
 import { Args, Int } from '@nestjs/graphql';
@@ -10,45 +11,47 @@ import { updateTokenInput } from './dto/update.token.input';
 import { subscribeTokenInput } from './dto/subscribe.token.input';
 import { Token } from './entities/token.entity';
 import { Email } from 'src/email/entities/email.entity';
-// import { Subscription } from './interfaces/subscription.interface';
 @Injectable()
 export class TokenService {
   constructor(
     @InjectRepository(Token) private tokenRepository: Repository<Token>,
     @InjectRepository(Email) private emailRepository: Repository<Email>,
     private readonly schedulerRegistry: SchedulerRegistry,
+    private readonly configService: ConfigService,
     private readonly mailService: MailService,
   ) {}
 
-  private schedules(launch: Date, address: string, id: number) {
-    console.log(address, launch, id);
+  private schedules(
+    launch: Date,
+    address: string,
+    id: number,
+  ): {
+    time: number;
+    name: string;
+    when: string;
+  }[] {
     const time = new Date(launch).getTime();
-    console.log('schedules: ', time);
     const day_ms = 1000 * 60 * 60 * 24;
     const hour_ms = 1000 * 60 * 60;
     const min_ms = 1000 * 60 * 30;
     const day = Math.floor(time - day_ms);
     const hour = Math.floor(time - hour_ms);
     const min = Math.floor(time - min_ms);
-    console.log('day: ', day, 'hour', hour, 'min', min);
 
     return [
       {
-        time: day,
-        name: `day_${address}_${id}`,
-        job: `day_job`,
-        when: '1 day',
+        time: min,
+        name: `min_${address}_${id}`,
+        when: '30 mins',
       },
       {
         time: hour,
         name: `hour_${address}_${id}`,
-        job: `hour_job`,
-        when: '1 day',
+        when: '1 hour',
       },
       {
-        time: min,
-        name: `min_${address}_${id}`,
-        job: `min_job`,
+        time: day,
+        name: `day_${address}_${id}`,
         when: '1 day',
       },
     ];
@@ -144,6 +147,12 @@ export class TokenService {
       console.log('schedule: ', schedule.time);
       const job = new CronJob(new Date(schedule.time), () => {
         console.log(`${schedule.name} job at (${new Date(schedule.time)})!`);
+        this.mailService.sendMail({
+          from: this.configService.get<string>('EMAIL_USER'),
+          to: address,
+          subject: `Token Reminder`,
+          text: `REMINDER - THE COLLECTION ${name} LAUNCHES IN ${schedule.when}`,
+        });
       });
       this.schedulerRegistry.addCronJob(`${schedule.name}`, job);
       job.start();
@@ -151,48 +160,6 @@ export class TokenService {
         `Job ${schedule.name} scheduled for ${new Date(schedule.time)}.`,
       );
     });
-    // const time = new Date(launch).getTime();
-    // console.log(address, time, id);
-    // const day_ms = 1000 * 60 * 60 * 24;
-    // const hour_ms = 1000 * 60 * 60;
-    // const min_ms = 1000 * 60 * 30;
-    // const day = Math.floor((time - day_ms) / 1000);
-    // const hour = Math.floor((time - hour_ms) / 1000);
-    // const min = Math.floor((time - min_ms) / 1000);
-
-    // const job1 = new CronJob(new Date(day * 1000), () => {
-    //   console.log(`time (${new Date(day * 1000)}) for job ${address} to run!`);
-    //   // this.mailService.sendMail({
-    //   //   to: address,
-    //   //   subject: `Token Reminder`,
-    //   //   text: `REMINDER - THE COLLECTION ${name} LAUNCHES IN 1day`,
-    //   // });
-    // });
-    // const job2 = new CronJob(new Date(hour * 1000), () => {
-    //   console.log(`time (${new Date(hour * 1000)}) for job ${address} to run!`);
-    //   // this.mailService.sendMail({
-    //   //   to: address,
-    //   //   subject: `Token Reminder`,
-    //   //   text: `REMINDER - THE COLLECTION ${name} LAUNCHES IN 1h`,
-    //   // });
-    // });
-    // const job3 = new CronJob(new Date(min * 1000), () => {
-    //   console.log(`time (${new Date(min * 1000)}) for job ${address} to run!`);
-    //   // this.mailService.sendMail({
-    //   //   to: address,
-    //   //   subject: `Token Reminder`,
-    //   //   text: `REMINDER - THE COLLECTION ${name} LAUNCHES IN 30 mins`,
-    //   // });
-    // });
-
-    // this.schedulerRegistry.addCronJob(`day_${address}_${id}`, job1);
-    // job1.start();
-    // this.schedulerRegistry.addCronJob(`hour_${address}_${id}`, job2);
-    // job2.start();
-    // this.schedulerRegistry.addCronJob(`min_${address}_${id}`, job3);
-    // job3.start();
-
-    // console.log(`Job ${address} added for time ${new Date(time)}.`);
   }
 
   deleteCronJob(name: string) {
@@ -225,10 +192,6 @@ export class TokenService {
       }
       console.log('Add new job', email.address, time, id);
       this.addNewJob(email.address, time, token);
-      const jobs = this.schedulerRegistry.getCronJobs();
-      jobs.forEach((value, key, map) => {
-        console.log(key);
-      });
     });
   }
 }
