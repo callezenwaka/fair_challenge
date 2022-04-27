@@ -22,12 +22,10 @@ export class EmailService {
       const email = this.emailRepository.create(postEmailInput);
       return this.emailRepository.save(email);
     }
-    // const email = this.emailRepository.create(postEmailInput);
-    // return this.emailRepository.save(email);
   }
 
   async getEmails(): Promise<Email[]> {
-    return this.emailRepository.find();
+    return this.emailRepository.find({ relations: ['tokens'] });
   }
 
   async getEmail(@Args('id', { type: () => Int }) id: number): Promise<Email> {
