@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Link } from "react-router-dom";
 import { GetTokensQuery } from '../../generated/graphql';
 import './Tokens.css';
@@ -19,7 +19,6 @@ interface Props {
 const className = 'Tokens';
 
 const Tokens: FC<Props> = ({ data }) => {
-  const [editing, setEditing] = useState<boolean>(false);
 
   return (
     <div className="flex flex-col items-center text-center pb-8 px-2">

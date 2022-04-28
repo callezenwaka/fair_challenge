@@ -137,6 +137,15 @@ export type GetTokenQueryVariables = Exact<{
 
 export type GetTokenQuery = { __typename?: 'Query', token: { __typename?: 'Token', id: number, name: string, launch?: any | null } };
 
+export type UpdateTokenMutationVariables = Exact<{
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  launch?: InputMaybe<Scalars['DateTime']>;
+}>;
+
+
+export type UpdateTokenMutation = { __typename?: 'Mutation', updateToken: { __typename?: 'Token', id: number, name: string, launch?: any | null } };
+
 export type GetTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -216,6 +225,43 @@ export function useGetTokenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetTokenQueryHookResult = ReturnType<typeof useGetTokenQuery>;
 export type GetTokenLazyQueryHookResult = ReturnType<typeof useGetTokenLazyQuery>;
 export type GetTokenQueryResult = Apollo.QueryResult<GetTokenQuery, GetTokenQueryVariables>;
+export const UpdateTokenDocument = gql`
+    mutation updateToken($id: Int!, $name: String!, $launch: DateTime) {
+  updateToken(updateTokenInput: {id: $id, name: $name, launch: $launch}) {
+    id
+    name
+    launch
+  }
+}
+    `;
+export type UpdateTokenMutationFn = Apollo.MutationFunction<UpdateTokenMutation, UpdateTokenMutationVariables>;
+
+/**
+ * __useUpdateTokenMutation__
+ *
+ * To run a mutation, you first call `useUpdateTokenMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateTokenMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateTokenMutation, { data, loading, error }] = useUpdateTokenMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *      launch: // value for 'launch'
+ *   },
+ * });
+ */
+export function useUpdateTokenMutation(baseOptions?: Apollo.MutationHookOptions<UpdateTokenMutation, UpdateTokenMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateTokenMutation, UpdateTokenMutationVariables>(UpdateTokenDocument, options);
+      }
+export type UpdateTokenMutationHookResult = ReturnType<typeof useUpdateTokenMutation>;
+export type UpdateTokenMutationResult = Apollo.MutationResult<UpdateTokenMutation>;
+export type UpdateTokenMutationOptions = Apollo.BaseMutationOptions<UpdateTokenMutation, UpdateTokenMutationVariables>;
 export const GetTokensDocument = gql`
     query getTokens {
   tokens {

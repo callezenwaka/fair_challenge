@@ -20,7 +20,6 @@ const className = 'Reminder';
 
 const Reminders: React.FC<Props> = (Props) => {
   const [address, setAddress] = useState<string>('');
-  // const [modal, setModal] = useState<boolean>(false);
   const [setReminder] = useSetReminderMutation();
   // const { data, error, loading, refetch } = useGetTokenQuery({
   //   variables: { id: Number(id) },
@@ -31,6 +30,8 @@ const Reminders: React.FC<Props> = (Props) => {
   //   const target = e.target as HTMLInputElement;
   //   setAddress(target.value);
   // }
+
+
 
   const handleReminder = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,24 +51,31 @@ const Reminders: React.FC<Props> = (Props) => {
   };
 
   return (
-    <div className='w-full md:w-1/2 mr-auto ml-auto p-2 my-12 relative'>
-      <h1 className={`${className}__title pb-4`}>Set Reminder</h1>
+    <div className={`${className}__form w-full md:w-1/2 mr-auto ml-auto p-2 my-12 relative rounded-md h-72 shadow-md`}>
+      <h1 className={`${className}__title pb-4`}>Get reminded about Shapes of Tokyo</h1>
       <button type="button" className={`absolute top-1.5 right-4 text-2xl`} onClick={() => Props.handleModal(false)}>&#10005;</button>
       <form className={`flex flex-col`}>
         <div className="w-full text-left mb-6">
-          <label className=''>Email: </label>
+          <label htmlFor="email" className=''>Email: *</label>
           <input
             placeholder="john.doe@mail.com"
-            className="w-full p-2.5 border-b-2 border-slate-700 border-solid"
+            id="email" name="email"
+            className="w-full p-2.5 border-b-2 border-2 border-slate-700 border-solid"
             onChange={(e) => setAddress(e.target.value)}/>
         </div>
-        <div className='w-full text-center mb-6'>
+        <div className="w-full text-left mb-6">
+          <label htmlFor="agree" className='text-left pr-4'>
+            Agree to our terms and Conditions
+          </label>
+          <input type="checkbox" id="agree" name="agree" value="true" />
+        </div>
+        <div className='w-full text-right mb-6'>
           <button
             type='button'
-            className="w-full py-2 px-2 border-solid border-2 border-slate-700 rounded-md bg-slate-700 hover:bg-slate-400 text-white"
+            className="py-1.5 px-4 border-solid border-black border-2 rounded-xl text-black"
             onClick={handleReminder}
           >
-            Submit
+            LOGIN
           </button>
         </div>
       </form>

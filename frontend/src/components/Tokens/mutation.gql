@@ -1,0 +1,12 @@
+mutation updateToken($id: Int!, $name: String!, $launch: DateTime) {
+  updateToken(
+    updateTokenInput: {
+      id: $id
+      name: $name
+      launch: $launch
+    }) {
+    id
+    name
+    launch
+  }
+}

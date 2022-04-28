@@ -1,19 +1,19 @@
-.Token {
+.Reminder {
   text-align: center;
 }
 
-.Token-logo {
+.Reminder__logo {
   height: 40vmin;
   pointer-events: none;
 }
 
 /* @media (prefers-reduced-motion: no-preference) {
-  .Token-logo {
+  .Reminder__logo {
     animation: App-logo-spin infinite 20s linear;
   }
 } */
 
-.Token {
+.Reminder {
   height: 100vh;
   max-height: 100%;
   width: calc(100vw - 300px);
@@ -22,11 +22,15 @@
   padding-right: 20px;
 }
 
-.Token__status {
+.Reminder__form {
+  background-color: #F5F4F2;
+}
+
+.Reminder__status {
   margin-top: 40px;
 }
 
-.Token__title {
+.Reminder__title {
   margin-top: 0;
   margin-bottom: 4px;
 }
