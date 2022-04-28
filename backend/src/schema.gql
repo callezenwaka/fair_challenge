@@ -31,7 +31,9 @@ type Mutation {
   postToken(postTokenInput: postTokenInput!): Token!
   updateToken(updateTokenInput: updateTokenInput!): Token!
   deleteToken(id: Int!): Token!
-  subscribeToken(subscribeTokenInput: subscribeTokenInput!): Token!
+
+  """This resolves email reminder mutation."""
+  setReminder(reminderInput: reminderInput!): Token!
   postEmail(postEmailInput: postEmailInput!): Email!
   updateEmail(updateEmailInput: UpdateEmailInput!): Email!
   removeEmail(id: Int!): Email!
@@ -48,7 +50,7 @@ input updateTokenInput {
   launch: DateTime
 }
 
-input subscribeTokenInput {
+input reminderInput {
   id: Int!
   address: String!
 }

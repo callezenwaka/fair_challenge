@@ -30,7 +30,8 @@ export type Mutation = {
   postEmail: Email;
   postToken: Token;
   removeEmail: Email;
-  subscribeToken: Token;
+  /** This resolves email reminder mutation. */
+  setReminder: Token;
   updateEmail: Email;
   updateToken: Token;
 };
@@ -56,8 +57,8 @@ export type MutationRemoveEmailArgs = {
 };
 
 
-export type MutationSubscribeTokenArgs = {
-  subscribeTokenInput: SubscribeTokenInput;
+export type MutationSetReminderArgs = {
+  reminderInput: ReminderInput;
 };
 
 
@@ -110,7 +111,7 @@ export type PostTokenInput = {
   name: Scalars['String'];
 };
 
-export type SubscribeTokenInput = {
+export type ReminderInput = {
   address: Scalars['String'];
   id: Scalars['Int'];
 };

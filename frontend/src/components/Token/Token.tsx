@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { GetTokenQuery } from '../../generated/graphql';
 import './Token.css';
 import avatar from '../../assets/avatar.png';
@@ -33,32 +33,3 @@ const Tokens: React.FC<Props> = ({ data }) => {
 };
 
 export default Tokens;
-
-// function Tokens() {
-//   const { data, loading } = useQuery<Token[]>(GET_TOKENS);
-//   console.log(data);
-//   console.log(loading);
-
-//   const {tokens} = data;
-//   console.log(tokens);
-
-//   // const [deleteUser] = useMutation(DELETE_USER);
-
-//   return (
-//     <div className="Token">
-//       {/* Loading!!! getTokens */}
-//       {data &&
-//         data.tokens.map((token: Token) => {
-//           return (
-//             <div key={token.id}>
-//               <img src={avatar} className="Token-logo" alt="logo" />
-//               {token.name} / {token.launch}
-//             </div>
-//           );
-//         })
-//       }
-//     </div>
-//   );
-// }
-
-// export default Tokens;

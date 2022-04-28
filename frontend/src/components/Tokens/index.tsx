@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useGetTokensQuery } from '../../generated/graphql';
 import Tokens, { OwnProps } from './Tokens';
 

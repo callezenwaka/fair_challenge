@@ -8,9 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Repository } from 'typeorm';
 import { postTokenInput } from './dto/post.token.input';
 import { updateTokenInput } from './dto/update.token.input';
-import { subscribeTokenInput } from './dto/subscribe.token.input';
+import { reminderInput } from './dto/reminder.token.input';
 import { Token } from './entities/token.entity';
 import { Email } from 'src/email/entities/email.entity';
+import { ScheduleInterface } from './interfaces/schedule.interface';
 @Injectable()
 export class TokenService {
   constructor(
@@ -25,11 +26,7 @@ export class TokenService {
     launch: Date,
     address: string,
     id: number,
-  ): {
-    time: number;
-    name: string;
-    when: string;
-  }[] {
+  ): ScheduleInterface[] {
     const time = new Date(launch).getTime();
     const day_ms = 1000 * 60 * 60 * 24;
     const hour_ms = 1000 * 60 * 60;
@@ -79,20 +76,20 @@ export class TokenService {
 
   async updateToken(
     @Args('id', { type: () => Int }) id: number,
-    updateTokenInput: updateTokenInput,
+    updateInput: updateTokenInput,
   ): Promise<Token> {
-    const { launch } = updateTokenInput;
+    const { launch } = updateInput;
     const token = await this.getToken(id);
     if (token === undefined) {
       throw new NotFoundException();
     }
-    console.log(token.launch === updateTokenInput.launch);
-    if (updateTokenInput.launch && updateTokenInput.launch !== token.launch) {
+    console.log(token.launch === updateInput.launch);
+    if (updateInput.launch && updateInput.launch !== token.launch) {
       // TODO: update reminder
       const isNew = token.launch === null ? true : false;
       this.getCronJobs(token, launch, isNew);
     }
-    await this.tokenRepository.save(updateTokenInput);
+    await this.tokenRepository.save(updateInput);
     return this.tokenRepository.findOne(id, {
       relations: ['emails'],
     });
@@ -108,11 +105,11 @@ export class TokenService {
     return this.tokenRepository.delete(id);
   }
 
-  async subscribeToken(
+  async setReminder(
     @Args('id', { type: () => Int }) id: number,
-    subscribeTokenInput: subscribeTokenInput,
+    Input: reminderInput,
   ): Promise<Token> {
-    const { address } = subscribeTokenInput;
+    const { address } = Input;
     const token = await this.getToken(id);
     if (token === undefined) {
       throw new NotFoundException();
@@ -145,6 +142,7 @@ export class TokenService {
     const schedules = this.schedules(launch, address, id);
     schedules.forEach((schedule) => {
       console.log('schedule: ', schedule.time);
+      // TODO: Check if date is in the past
       const job = new CronJob(new Date(schedule.time), () => {
         console.log(`${schedule.name} job at (${new Date(schedule.time)})!`);
         this.mailService.sendMail({

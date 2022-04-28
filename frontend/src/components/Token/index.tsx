@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React from 'react';
 import { useGetTokenQuery } from '../../generated/graphql';
 import Token from './Token';
 
