@@ -1,0 +1,11 @@
+mutation setReminder($id: Int!, $address: String!) {
+  setReminder(
+    reminderInput: {
+      id: $id
+      address: $address
+    }) {
+    id
+    name
+    launch
+  }
+}

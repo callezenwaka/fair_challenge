@@ -1,32 +1,21 @@
 import * as React from 'react';
-import { useGetTokenQuery } from '../../generated/graphql';
 import Reminder from './Reminder';
 
-interface OwnProps {
+export interface MainProps {
+  closeModal: (isClose: boolean) => void;
+}
+
+interface OwnProps extends MainProps {
   id: number;
 }
 
-const ReminderContainer: React.FC<OwnProps> = ({ id }) => {
-  const { data, error, loading, refetch } = useGetTokenQuery({
-    variables: { id },
-  });
-  React.useEffect(() => {
-    refetch({ id });
-  }, [refetch, id]);
-
-  if (loading) {
-    return <div>Loading...</div>;
+const ReminderContainer: React.FC<OwnProps> = (OwnProps) => {
+  const handleModal = (isModal: boolean) => {
+    console.log(isModal);
+    OwnProps.closeModal(isModal)
   }
 
-  if (error) {
-    return <div>ERROR</div>;
-  }
-
-  if (!data) {
-    return <div>Select a flight from the panel</div>;
-  }
-
-  return <Reminder data={data} />;
+  return <Reminder id={OwnProps.id} handleModal={handleModal} />;
 };
 
 export default ReminderContainer;

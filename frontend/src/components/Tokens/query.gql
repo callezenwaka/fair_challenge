@@ -1,0 +1,7 @@
+query getTokens {
+  tokens {
+    id
+    name
+    launch
+  }
+}

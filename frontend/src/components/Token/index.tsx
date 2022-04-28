@@ -1,17 +1,16 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import { useGetTokenQuery } from '../../generated/graphql';
 import Token from './Token';
 
-interface OwnProps {
-  id: number;
-}
+const TokenContainer: React.FC = () => {
+  let { id } = useParams();
 
-const TokenContainer: React.FC<OwnProps> = ({ id }) => {
   const { data, error, loading, refetch } = useGetTokenQuery({
-    variables: { id },
+    variables: { id: Number(id) },
   });
   React.useEffect(() => {
-    refetch({ id });
+    refetch({ id: Number(id) });
   }, [refetch, id]);
 
   if (loading) {

@@ -1,0 +1,7 @@
+query getToken($id: Int!) {
+  token(id: $id) {
+    id
+    name
+    launch
+  }
+}

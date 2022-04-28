@@ -1,8 +1,8 @@
-import React from 'react';
+import { FC } from 'react';
 import { useGetTokensQuery } from '../../generated/graphql';
-import Tokens, { OwnProps } from './Tokens';
+import Tokens from './Tokens';
 
-const TokensContainer: React.FC<OwnProps> = (props) => {
+const TokensContainer: FC = () => {
   const { data, error, loading } = useGetTokensQuery();
   console.log(data);
 
@@ -14,7 +14,7 @@ const TokensContainer: React.FC<OwnProps> = (props) => {
     return <div>ERROR</div>;
   }
 
-  return <Tokens data={data} {...props} />;
+  return <Tokens data={data} />;
 };
 
 export default TokensContainer;

@@ -122,6 +122,14 @@ export type UpdateTokenInput = {
   name: Scalars['String'];
 };
 
+export type SetReminderMutationVariables = Exact<{
+  id: Scalars['Int'];
+  address: Scalars['String'];
+}>;
+
+
+export type SetReminderMutation = { __typename?: 'Mutation', setReminder: { __typename?: 'Token', id: number, name: string, launch?: any | null } };
+
 export type GetTokenQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -135,6 +143,42 @@ export type GetTokensQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetTokensQuery = { __typename?: 'Query', tokens: Array<{ __typename?: 'Token', id: number, name: string, launch?: any | null }> };
 
 
+export const SetReminderDocument = gql`
+    mutation setReminder($id: Int!, $address: String!) {
+  setReminder(reminderInput: {id: $id, address: $address}) {
+    id
+    name
+    launch
+  }
+}
+    `;
+export type SetReminderMutationFn = Apollo.MutationFunction<SetReminderMutation, SetReminderMutationVariables>;
+
+/**
+ * __useSetReminderMutation__
+ *
+ * To run a mutation, you first call `useSetReminderMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSetReminderMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [setReminderMutation, { data, loading, error }] = useSetReminderMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      address: // value for 'address'
+ *   },
+ * });
+ */
+export function useSetReminderMutation(baseOptions?: Apollo.MutationHookOptions<SetReminderMutation, SetReminderMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SetReminderMutation, SetReminderMutationVariables>(SetReminderDocument, options);
+      }
+export type SetReminderMutationHookResult = ReturnType<typeof useSetReminderMutation>;
+export type SetReminderMutationResult = Apollo.MutationResult<SetReminderMutation>;
+export type SetReminderMutationOptions = Apollo.BaseMutationOptions<SetReminderMutation, SetReminderMutationVariables>;
 export const GetTokenDocument = gql`
     query getToken($id: Int!) {
   token(id: $id) {
