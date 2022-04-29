@@ -10,17 +10,17 @@ Each collection at Fair.xyz has a specific launch date. When Fair.xyz users visi
 
 The way in which the ‘REMIND ME’ functionality works is as following:
 
-- [x] When clicking the button, a modal opens. In it we will ask the user to enter their email where we will send them the reminder
-- [x] When clicking confirm, an email will be sent to that person on 3 occasions: 1 day before the launch date, 1 hour before the launch date and when the launch date arrives
-- [x] The text in the emails sent before the launch date should be: `REMINDER - THE COLLECTION <COLLECTION_NAME> LAUNCHES IN <TIME (30 mins / 1h / 1day)>`
-- [x] The text in the emails sent when launch date arrives should be: `<COLLECTION_NAME> IS LAUNCHING NOW!`
+:white_check_mark: - When clicking the button, a modal opens. In it we will ask the user to enter their email where we will send them the reminder
+:white_check_mark: - When clicking confirm, an email will be sent to that person on 3 occasions: 1 day before the launch date, 1 hour before the launch date and when the launch date arrives
+:white_check_mark: - The text in the emails sent before the launch date should be: `REMINDER - THE COLLECTION <COLLECTION_NAME> LAUNCHES IN <TIME (30 mins / 1h / 1day)>`
+:white_check_mark: - The text in the emails sent when launch date arrives should be: `<COLLECTION_NAME> IS LAUNCHING NOW!`
 
 ### TASK DESCRIPTION
 
-- [x] You should define at least 6 dummy collections, some of them with a launch date TBD and some of them with a specific launch date. They can be hardcoded in the frontend.
-- [x] Each collection should have 2 fields: Name (string) and launchDate, which includes day and time of launch (Date | null).
-- [x] The launch date and the name can be editable from the frontend (the name by an input component and the date by a component to choose the date).
-- [x] You should implement one ‘REMIND ME’ button per collection. Each button should send the emails for that specific collection (meaning with the appropriate name / launch date).
+:white_check_mark: - You should define at least 6 dummy collections, some of them with a launch date TBD and some of them with a specific launch date. They can be hardcoded in the frontend.
+:white_check_mark: - Each collection should have 2 fields: Name (string) and launchDate, which includes day and time of launch (Date | null).
+:white_check_mark: - The launch date and the name can be editable from the frontend (the name by an input component and the date by a component to choose the date).
+:white_check_mark: - You should implement one ‘REMIND ME’ button per collection. Each button should send the emails for that specific collection (meaning with the appropriate name / launch date).
 
 ### **ASSUMPTIONS**
 
@@ -36,22 +36,22 @@ One of the most anticipated moments after buying an NFT is having a cool reveal 
 
 ### TASK DESCRIPTION
 
-- [x] Check the Figma at the bottom of this page and build the Frontend reveal experience for the user.
-- [x] You will need to display 4 images. Each of them will be blurred in the beginning. When hovering over the image, the text ‘CLICK TO REVEAL’ should appear on top of the cursor. When clicking, the image becomes gradually unblurred (the transition time should be 1500ms).
+:white_check_mark: - Check the Figma at the bottom of this page and build the Frontend reveal experience for the user.
+:white_check_mark: - You will need to display 4 images. Each of them will be blurred in the beginning. When hovering over the image, the text ‘CLICK TO REVEAL’ should appear on top of the cursor. When clicking, the image becomes gradually unblurred (the transition time should be 1500ms).
 
 ### **TECH STACK**
 
 **FRONTEND**
 
-- [x] To be done in React.js or Next.js with Typescript.
-- [x] Styling using Tailwind CSS. Responsive design is a must, and Tailwind makes this fairly easy.
-- [x] Big plus if you use any known query libraries such as Apollo or React Query.
-- [x] There should be a clear separation of all functional components. Special types and interfaces should be defined when possible.
-- [x] (Recommended) Using GraphQL
+:white_check_mark: - To be done in React.js or Next.js with Typescript.
+:white_check_mark: - Styling using Tailwind CSS. Responsive design is a must, and Tailwind makes this fairly easy.
+:white_check_mark: - Big plus if you use any known query libraries such as Apollo or React Query.
+:white_check_mark: - There should be a clear separation of all functional components. Special types and interfaces should be defined when possible.
+:white_check_mark: - (Recommended) Using GraphQL
 
 **BACKEND**
 
-- [x] To be done in Nest.js with Typescript.
-- [x] You can define a PostgreSQL database to store any relevant data for this task.
-- [x] For Task 1, we recommend using nodemailer to send the emails.
-- [x] (Recommended) Using GraphQL
+:white_check_mark: - To be done in Nest.js with Typescript.
+:white_check_mark: - You can define a PostgreSQL database to store any relevant data for this task.
+:white_check_mark: - For Task 1, we recommend using nodemailer to send the emails.
+:white_check_mark: - (Recommended) Using GraphQL
