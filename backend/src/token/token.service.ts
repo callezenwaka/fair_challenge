@@ -63,11 +63,6 @@ export class TokenService {
     }
   }
 
-  /**
-   * add token
-   * @param postTokenInput
-   * @returns
-   */
   async postToken(postTokenInput: postTokenInput): Promise<Token> {
     const token = this.tokenRepository.create(postTokenInput);
     return this.tokenRepository.save(token);
@@ -92,12 +87,10 @@ export class TokenService {
     }
 
     if (updateInput.name !== token.name) {
-      // TODO: update name
       token.name = updateInput.name;
     }
 
     if (updateInput.launch !== token.launch) {
-      // TODO: update reminder
       token.launch = updateInput.launch;
       this.getCrons(token, launch);
     }
@@ -129,12 +122,10 @@ export class TokenService {
     }
 
     const email = (await emails).some((email) => email.address == address);
-
     if (!email) {
       const input = { id: (await emails).length - 1, address };
       (await emails).push(input);
     }
-
     if (token.launch !== null) {
       const schedules: string[] = ['now', 'min', 'hour', 'day'];
       schedules.forEach((schedule) => {
@@ -146,49 +137,55 @@ export class TokenService {
   }
 
   deleteCron(name: string) {
-    this.schedulerRegistry.deleteCronJob(name);
+    try {
+      this.schedulerRegistry.deleteCronJob(name);
+    } catch (error) {}
   }
 
   addCron(schedule: string, address: string, launch: Date, token: Token) {
-    const { when, job, time } = this.scheduler(schedule, launch);
-    const { id, name } = token;
-    const jobName = `${job}_${address}_${id}`;
-    const text =
-      schedule == 'NOW!'
-        ? `${name} IS LAUNCHING ${when}!`
-        : `REMINDER - THE COLLECTION ${name} LAUNCHES IN ${when}`;
+    try {
+      const { when, job, time } = this.scheduler(schedule, launch);
+      const { id, name } = token;
+      const jobName = `${job}_${address}_${id}`;
+      const text =
+        schedule == 'NOW!'
+          ? `${name} IS LAUNCHING ${when}!`
+          : `REMINDER - THE COLLECTION ${name} LAUNCHES IN ${when}`;
 
-    // if (new Date(time).getTime() < new Date().getTime()) return;
+      // if (new Date(time).getTime() < new Date().getTime()) return;
 
-    const task = new CronJob(new Date(time), () => {
-      console.log(`${jobName} job at (${new Date(time)})!`);
-      this.mailService.sendMail({
-        from: this.configService.get<string>('EMAIL_USER'),
-        to: address,
-        subject: `Token Reminder`,
-        text: `${text}`,
+      const task = new CronJob(new Date(time), () => {
+        console.log(`${jobName} job at (${new Date(time)})!`);
+        this.mailService.sendMail({
+          from: this.configService.get<string>('EMAIL_USER'),
+          to: address,
+          subject: `Token Reminder`,
+          text: `${text}`,
+        });
       });
-    });
-    this.schedulerRegistry.addCronJob(`${jobName}`, task);
-    task.start();
-    console.log(`Job ${jobName} scheduled for ${new Date(time)}.`);
+      this.schedulerRegistry.addCronJob(`${jobName}`, task);
+      task.start();
+      console.log(`Job ${jobName} scheduled for ${new Date(time)}.`);
+    } catch (error) {}
   }
 
   getCrons(token: Token, date: Date) {
-    const { id } = token;
-    const Keys: string[] = [];
-    const jobs = this.schedulerRegistry.getCronJobs();
-    jobs.forEach((value, key) => {
-      if (id == Number(key.split('_').pop())) {
-        Keys.push(key);
-        this.deleteCron(key);
-      }
-    });
-    Keys.forEach((key) => {
-      const { _when, _address } = this.schedule(key);
-      if (date != null) {
-        this.addCron(_when, _address, date, token);
-      }
-    });
+    try {
+      const { id } = token;
+      const Keys: string[] = [];
+      const jobs = this.schedulerRegistry.getCronJobs();
+      jobs.forEach((value, key) => {
+        if (id == Number(key.split('_').pop())) {
+          Keys.push(key);
+          this.deleteCron(key);
+        }
+      });
+      Keys.forEach((key) => {
+        const { _when, _address } = this.schedule(key);
+        if (date != null) {
+          this.addCron(_when, _address, date, token);
+        }
+      });
+    } catch (error) {}
   }
 }
