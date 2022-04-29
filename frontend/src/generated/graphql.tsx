@@ -17,22 +17,12 @@ export type Scalars = {
   DateTime: any;
 };
 
-export type Email = {
-  __typename?: 'Email';
-  address: Scalars['String'];
-  id: Scalars['Int'];
-  tokens?: Maybe<Array<Token>>;
-};
-
 export type Mutation = {
   __typename?: 'Mutation';
   deleteToken: Token;
-  postEmail: Email;
   postToken: Token;
-  removeEmail: Email;
   /** This resolves email reminder mutation. */
   setReminder: Token;
-  updateEmail: Email;
   updateToken: Token;
 };
 
@@ -42,28 +32,13 @@ export type MutationDeleteTokenArgs = {
 };
 
 
-export type MutationPostEmailArgs = {
-  postEmailInput: PostEmailInput;
-};
-
-
 export type MutationPostTokenArgs = {
   postTokenInput: PostTokenInput;
 };
 
 
-export type MutationRemoveEmailArgs = {
-  id: Scalars['Int'];
-};
-
-
 export type MutationSetReminderArgs = {
   reminderInput: ReminderInput;
-};
-
-
-export type MutationUpdateEmailArgs = {
-  updateEmailInput: UpdateEmailInput;
 };
 
 
@@ -73,15 +48,8 @@ export type MutationUpdateTokenArgs = {
 
 export type Query = {
   __typename?: 'Query';
-  getEmail: Email;
-  getEmails: Array<Email>;
   token: Token;
   tokens: Array<Token>;
-};
-
-
-export type QueryGetEmailArgs = {
-  id: Scalars['Int'];
 };
 
 
@@ -91,19 +59,9 @@ export type QueryTokenArgs = {
 
 export type Token = {
   __typename?: 'Token';
-  emails?: Maybe<Array<Email>>;
   id: Scalars['Int'];
   launch?: Maybe<Scalars['DateTime']>;
   name: Scalars['String'];
-};
-
-export type UpdateEmailInput = {
-  address?: InputMaybe<Scalars['String']>;
-  id: Scalars['Int'];
-};
-
-export type PostEmailInput = {
-  address: Scalars['String'];
 };
 
 export type PostTokenInput = {

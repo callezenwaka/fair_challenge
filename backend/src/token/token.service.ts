@@ -10,48 +10,57 @@ import { postTokenInput } from './dto/post.token.input';
 import { updateTokenInput } from './dto/update.token.input';
 import { reminderInput } from './dto/reminder.token.input';
 import { Token } from './entities/token.entity';
-import { Email } from 'src/email/entities/email.entity';
-import { ScheduleInterface } from './interfaces/schedule.interface';
+import { tokens, emails } from '../database/database';
 @Injectable()
 export class TokenService {
   constructor(
     @InjectRepository(Token) private tokenRepository: Repository<Token>,
-    @InjectRepository(Email) private emailRepository: Repository<Email>,
     private readonly schedulerRegistry: SchedulerRegistry,
     private readonly configService: ConfigService,
     private readonly mailService: MailService,
   ) {}
 
-  private schedules(
-    launch: Date,
-    address: string,
-    id: number,
-  ): ScheduleInterface[] {
-    const time = new Date(launch).getTime();
-    const day_ms = 1000 * 60 * 60 * 24;
-    const hour_ms = 1000 * 60 * 60;
-    const min_ms = 1000 * 60 * 30;
-    const day = Math.floor(time - day_ms);
-    const hour = Math.floor(time - hour_ms);
-    const min = Math.floor(time - min_ms);
+  private schedule(job: string): {
+    _when: string;
+    _address: string;
+    _id: number;
+  } {
+    const _id = Number(job.split('_').pop());
+    const _when = job.split('_')[0];
+    const str = job.slice(0, job.lastIndexOf('_'));
+    const _address = str.slice(str.indexOf('_') + 1);
+    return { _id, _when, _address };
+  }
 
-    return [
-      {
-        time: min,
-        name: `min_${address}_${id}`,
-        when: '30 mins',
-      },
-      {
-        time: hour,
-        name: `hour_${address}_${id}`,
-        when: '1 hour',
-      },
-      {
-        time: day,
-        name: `day_${address}_${id}`,
-        when: '1 day',
-      },
-    ];
+  private scheduler(
+    schedule: string,
+    launch: Date,
+  ): {
+    when: string;
+    job: string;
+    time: number;
+  } {
+    const date = new Date(launch).getTime();
+    if (schedule == 'day') {
+      const day_ms = 1000 * 60 * 60 * 24;
+      const time = Math.floor(date - day_ms);
+
+      return { when: '1 day', time, job: `day` };
+    } else if (schedule == 'hour') {
+      const hour_ms = 1000 * 60 * 60;
+      const time = Math.floor(date - hour_ms);
+
+      return { when: '1 hour', time, job: `hour` };
+    } else if (schedule == 'min') {
+      const min_ms = 1000 * 60 * 30;
+      const time = Math.floor(date - min_ms);
+
+      return { when: '30 min', time, job: `min` };
+    } else {
+      const time = date;
+
+      return { when: 'NOW', time, job: `now` };
+    }
   }
 
   /**
@@ -65,13 +74,11 @@ export class TokenService {
   }
 
   async getTokens(): Promise<Token[]> {
-    return this.tokenRepository.find({ relations: ['emails'] });
+    return tokens;
   }
 
   async getToken(@Args('id', { type: () => Int }) id: number): Promise<Token> {
-    return this.tokenRepository.findOne(id, {
-      relations: ['emails'],
-    });
+    return (await tokens).find((i) => i.id == id);
   }
 
   async updateToken(
@@ -79,20 +86,25 @@ export class TokenService {
     updateInput: updateTokenInput,
   ): Promise<Token> {
     const { launch } = updateInput;
-    const token = await this.getToken(id);
+    const token = (await tokens).find((i) => i.id == id);
     if (token === undefined) {
       throw new NotFoundException();
     }
-    console.log(token.launch === updateInput.launch);
-    if (updateInput.launch && updateInput.launch !== token.launch) {
-      // TODO: update reminder
-      const isNew = token.launch === null ? true : false;
-      this.getCronJobs(token, launch, isNew);
+
+    if (updateInput.name !== token.name) {
+      // TODO: update name
+      token.name = updateInput.name;
     }
-    await this.tokenRepository.save(updateInput);
-    return this.tokenRepository.findOne(id, {
-      relations: ['emails'],
-    });
+
+    if (updateInput.launch !== token.launch) {
+      // TODO: update reminder
+      token.launch = updateInput.launch;
+      this.getCrons(token, launch);
+    }
+
+    const index = (await tokens).findIndex((token) => token.id == 12);
+    (await tokens).splice(index, 1, token);
+    return token;
   }
 
   async deleteToken(
@@ -110,86 +122,73 @@ export class TokenService {
     Input: reminderInput,
   ): Promise<Token> {
     const { address } = Input;
-    const token = await this.getToken(id);
+    const token = (await tokens).find((i) => i.id == id);
+
     if (token === undefined) {
       throw new NotFoundException();
     }
-    let email = await this.emailRepository.findOne({
-      where: { address },
-    });
-    console.log(email);
-    if (email === undefined) {
-      email = this.emailRepository.create({ address });
-    }
-    const item = token.emails.some((item) => item.address == email.address);
-    if (!item) {
-      token.emails = [email, ...token.emails];
+
+    const email = (await emails).some((email) => email.address == address);
+
+    if (!email) {
+      const input = { id: (await emails).length - 1, address };
+      (await emails).push(input);
     }
 
     if (token.launch !== null) {
-      console.log('Add new job', address, token.launch, token.id);
-      this.addNewJob(address, token.launch, token);
+      const schedules: string[] = ['now', 'min', 'hour', 'day'];
+      schedules.forEach((schedule) => {
+        this.addCron(schedule, address, token.launch, token);
+      });
     }
 
-    await this.tokenRepository.save(token);
-    return this.tokenRepository.findOne(id, {
-      relations: ['emails'],
-    });
+    return (await tokens).find((i) => i.id == id);
   }
 
-  addNewJob(address: string, launch: Date, token: Token) {
-    const { id, name } = token;
-    const schedules = this.schedules(launch, address, id);
-    schedules.forEach((schedule) => {
-      console.log('schedule: ', schedule.time);
-      // TODO: Check if date is in the past
-      const job = new CronJob(new Date(schedule.time), () => {
-        console.log(`${schedule.name} job at (${new Date(schedule.time)})!`);
-        this.mailService.sendMail({
-          from: this.configService.get<string>('EMAIL_USER'),
-          to: address,
-          subject: `Token Reminder`,
-          text: `REMINDER - THE COLLECTION ${name} LAUNCHES IN ${schedule.when}`,
-        });
-      });
-      this.schedulerRegistry.addCronJob(`${schedule.name}`, job);
-      job.start();
-      console.log(
-        `Job ${schedule.name} scheduled for ${new Date(schedule.time)}.`,
-      );
-    });
-  }
-
-  deleteCronJob(name: string) {
+  deleteCron(name: string) {
     this.schedulerRegistry.deleteCronJob(name);
   }
 
-  getCronJobs(token: Token, time: Date, isNew: boolean) {
-    const { id, emails } = token;
-    if (!emails.length) return;
-    emails.forEach((email) => {
-      if (!isNew) {
-        const job1 = this.schedulerRegistry.getCronJob(
-          `day_${email.address}_${id}`,
-        );
-        const job2 = this.schedulerRegistry.getCronJob(
-          `hour_${email.address}_${id}`,
-        );
-        const job3 = this.schedulerRegistry.getCronJob(
-          `min_${email.address}_${id}`,
-        );
-        if (job1) {
-          this.deleteCronJob(`day_${email.address}_${id}`);
-        }
-        if (job2) {
-          this.deleteCronJob(`hour_${email.address}_${id}`);
-        }
-        if (job3) {
-          this.deleteCronJob(`min_${email.address}_${id}`);
-        }
+  addCron(schedule: string, address: string, launch: Date, token: Token) {
+    const { when, job, time } = this.scheduler(schedule, launch);
+    const { id, name } = token;
+    const jobName = `${job}_${address}_${id}`;
+    const text =
+      schedule == 'NOW!'
+        ? `${name} IS LAUNCHING ${when}!`
+        : `REMINDER - THE COLLECTION ${name} LAUNCHES IN ${when}`;
+
+    // if (new Date(time).getTime() < new Date().getTime()) return;
+
+    const task = new CronJob(new Date(time), () => {
+      console.log(`${jobName} job at (${new Date(time)})!`);
+      this.mailService.sendMail({
+        from: this.configService.get<string>('EMAIL_USER'),
+        to: address,
+        subject: `Token Reminder`,
+        text: `${text}`,
+      });
+    });
+    this.schedulerRegistry.addCronJob(`${jobName}`, task);
+    task.start();
+    console.log(`Job ${jobName} scheduled for ${new Date(time)}.`);
+  }
+
+  getCrons(token: Token, date: Date) {
+    const { id } = token;
+    const Keys: string[] = [];
+    const jobs = this.schedulerRegistry.getCronJobs();
+    jobs.forEach((value, key) => {
+      if (id == Number(key.split('_').pop())) {
+        Keys.push(key);
+        this.deleteCron(key);
       }
-      console.log('Add new job', email.address, time, id);
-      this.addNewJob(email.address, time, token);
+    });
+    Keys.forEach((key) => {
+      const { _when, _address } = this.schedule(key);
+      if (date != null) {
+        this.addCron(_when, _address, date, token);
+      }
     });
   }
 }

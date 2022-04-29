@@ -4,12 +4,11 @@ import Tokens from './Tokens';
 
 const TokensContainer: FC = () => {
   const { data, error, loading } = useGetTokensQuery();
-  console.log(data);
 
-  if (loading) {
+  if (loading || !data) {
     return (
       <div className='px-2'>
-        <h3 className='py-8'>Latest NFTs</h3>
+        <h3 className='py-8'>NFT Collections</h3>
         <div className='flex flex-row flex-wrap gap-5 md:gap-0'>
           {[1, 2, 3, 4].map((element, i) => (
             <div key={i} className='w-full md:w-1/4 px-5'>
@@ -21,7 +20,7 @@ const TokensContainer: FC = () => {
     );
   }
 
-  if (error || !data) {
+  if (error) {
     return <div>ERROR</div>;
   }
 

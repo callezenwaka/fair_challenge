@@ -1,4 +1,3 @@
-// export { default as Loader } from "./Loader";
 export { default as Header } from "./Header";
 export { default as Tokens } from './Tokens';
 export { default as Token } from './Token';

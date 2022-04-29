@@ -6,14 +6,17 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TokenModule } from './token/token.module';
-import { EmailModule } from './email/email.module';
 import { MailModule } from './mail/mail.module';
+import { MailService } from './mail/mail.service';
 import { join } from 'path';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -29,14 +32,10 @@ dotenv.config();
       synchronize: true,
       logging: false,
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
     TokenModule,
-    EmailModule,
     MailModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MailService],
 })
 export class AppModule {}

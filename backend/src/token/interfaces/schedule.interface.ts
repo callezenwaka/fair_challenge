@@ -11,11 +11,3 @@ export abstract class ScheduleInterface {
   @Field()
   when: string;
 }
-
-// interface Schedule {
-//   time: number;
-//   name: string;
-//   when: string;
-// }
-
-// export default Schedule;

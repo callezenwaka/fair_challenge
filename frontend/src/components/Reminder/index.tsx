@@ -11,7 +11,6 @@ interface OwnProps extends MainProps {
 
 const ReminderContainer: React.FC<OwnProps> = (OwnProps) => {
   const handleModal = (isModal: boolean) => {
-    console.log(isModal);
     OwnProps.closeModal(isModal)
   }
 

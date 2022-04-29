@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import avatar from '../../assets/avatar.png';
-import './Reveal.css';
 
 interface Props {
   id: number;
 }
 
-// hidden hover:block
 const Reveal: React.FC<Props> = ({ id }) => {
   const [reveal, setReveal] = useState<boolean>(true);
 

@@ -6,7 +6,6 @@ const Header = () => {
     <nav className="">
       <Link to="/" className="px-2.5"> Home </Link> |
       <Link to="/reveal" className="px-2.5"> Trends </Link>
-      {/* <Link to="/token"> Token </Link> */}
     </nav>
   );
 };

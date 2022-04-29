@@ -11,48 +11,26 @@ interface Props extends OwnProps {
   id: number;
 }
 
-// interface Props {
-//   id: number;
-//   // isModal: boolean;
-// }
-
 const className = 'Reminder';
 
 const Reminders: React.FC<Props> = (Props) => {
   const [address, setAddress] = useState<string>('');
   const [setReminder] = useSetReminderMutation();
-  // const { data, error, loading, refetch } = useGetTokenQuery({
-  //   variables: { id: Number(id) },
-  // });
-
-  // const handleChange = (e: Event) => {
-  //   e.preventDefault();
-  //   const target = e.target as HTMLInputElement;
-  //   setAddress(target.value);
-  // }
-
-
 
   const handleReminder = (e: React.MouseEvent) => {
     e.preventDefault();
-    // setAddress(address);
     setReminder({
       variables: {
         id: Props.id,
         address,
       },
     });
-    console.log(Props.id, address);
-    // setAddress('');
-    // isModal = false;
-    // setModal(false);
     Props.handleModal(false)
-    // Props.handleModal(false);
   };
 
   return (
     <div className={`${className}__form w-full md:w-1/2 mr-auto ml-auto p-2 my-12 relative rounded-md h-72 shadow-md`}>
-      <h1 className={`${className}__title pb-4`}>Get reminded about Shapes of Tokyo</h1>
+      <h1 className={`mt-0 mb-1 pb-4`}>Get reminded about Shapes of Tokyo</h1>
       <button type="button" className={`absolute top-1.5 right-4 text-2xl`} onClick={() => Props.handleModal(false)}>&#10005;</button>
       <form className={`flex flex-col`}>
         <div className="w-full text-left mb-6">

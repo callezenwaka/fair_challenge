@@ -1,26 +1,22 @@
 import React, { useState } from 'react';
 import { GetTokenQuery, useUpdateTokenMutation } from '../../generated/graphql';
 import Reminder from "../Reminder";
-import './Token.css';
 import avatar from '../../assets/avatar.png';
 
 interface Props {
   data: GetTokenQuery;
 }
 
-const className = 'Token';
-
 const Token: React.FC<Props> = ({ data }) => {
   const { id } = data.token;
   const [updateToken] = useUpdateTokenMutation();
-  const [name, setName] = useState<string>('');
-  const [launch, setLaunch] = useState<Date>();
+  const [name, setName] = useState<string>(data.token.name);
+  const [launch, setLaunch] = useState<Date | null>(data.token.launch);
   const [editing, setEditing] = useState<boolean>(false);
   const [modal, setModal] = useState<boolean>(false);
   
   const handleSubmit = (e: React.MouseEvent) => {
     e.preventDefault();
-    console.log(id, name, launch);
     updateToken({
       variables: {
         id,
@@ -42,7 +38,7 @@ const Token: React.FC<Props> = ({ data }) => {
   if (editing) {
     return (
       <div className='w-full md:w-1/2 mr-auto ml-auto p-2 my-12 relative'>
-        <h1 className={`${className}__title pb-4`}>{data.token.name}</h1>
+        <h1 className={`mt-0 mb-1 pb-4`}>{data.token.name}</h1>
         <button type="button" className={`absolute top-1.5 right-4 text-2xl`} onClick={() => setEditing(false)}>&#10005;</button>
         <form className={`flex flex-col`}>
           <div className="w-full text-left mb-6">
@@ -80,11 +76,11 @@ const Token: React.FC<Props> = ({ data }) => {
 
   return (
     <div className={`flex flex-col w-full md:w-1/2 mr-auto ml-auto px-2 my-12 relative`}>
-      <h1 className={`${className}__title pb-4`}>{data.token.name}</h1>
+      <h1 className={`mt-0 mb-1 pb-4`}>{data.token.name}</h1>
       <button type="button" className={`absolute top-1.5 right-4 text-2xl`} onClick={() => setEditing(true)}>&#9998;</button>
       <img
         src={avatar}
-        className={`${className}__image pb-4`}
+        className={`pb-4`}
         key={data.token.id}
         alt={`${data.token?.name}`}
       />

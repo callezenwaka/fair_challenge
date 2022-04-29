@@ -2,17 +2,10 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Email {
-  id: Int!
-  address: String!
-  tokens: [Token!]
-}
-
 type Token {
   id: Int!
   name: String!
   launch: DateTime
-  emails: [Email!]
 }
 
 """
@@ -23,8 +16,6 @@ scalar DateTime
 type Query {
   tokens: [Token!]!
   token(id: Int!): Token!
-  getEmails: [Email!]!
-  getEmail(id: Int!): Email!
 }
 
 type Mutation {
@@ -34,9 +25,6 @@ type Mutation {
 
   """This resolves email reminder mutation."""
   setReminder(reminderInput: reminderInput!): Token!
-  postEmail(postEmailInput: postEmailInput!): Email!
-  updateEmail(updateEmailInput: UpdateEmailInput!): Email!
-  removeEmail(id: Int!): Email!
 }
 
 input postTokenInput {
@@ -53,13 +41,4 @@ input updateTokenInput {
 input reminderInput {
   id: Int!
   address: String!
-}
-
-input postEmailInput {
-  address: String!
-}
-
-input UpdateEmailInput {
-  address: String
-  id: Int!
 }
